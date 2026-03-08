@@ -1,4 +1,8 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    {{ form_row(form.titre, {'attr':{'class':'form form-control'}}) }}
+    {{ form_row(form.auteur, {'attr':{'class':'form form-control'}}) }}
+    {{ form_row(form.isbn, {'attr':{'class':'form form-control'}}) }}
+    {{ form_row(form.image, {'attr':{'class':'form form-control'}}) }}
+
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

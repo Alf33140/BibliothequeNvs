@@ -3,32 +3,37 @@
 {% block title %}Emprunt{% endblock %}
 
 {% block body %}
-    <h1>Emprunt</h1>
+    <div class="container containerForm">
+        <div class="form">
+            <h1>Emprunt</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ emprunt.id }}</td>
-            </tr>
-            <tr>
-                <th>DateEmprunt</th>
-                <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>DateRetour</th>
-                <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>{{ emprunt.status }}</td>
-            </tr>
-        </tbody>
-    </table>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>Id</th>
+                        <td>{{ emprunt.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>DateEmprunt</th>
+                        <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>DateRetour</th>
+                        <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i:s') : '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>{{ emprunt.status }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="{{ path('app_emprunt_index') }}"  class="btn btn-primary">Revenir à la liste</a>
 
-    <a href="{{ path('app_emprunt_index') }}"  class="btn btn-primary">Revenir à la liste</a>
+            <a href="{{ path('app_emprunt_edit', {'id': emprunt.id}) }}"  class="btn btn-secondary">Modifier</a>
 
-    <a href="{{ path('app_emprunt_edit', {'id': emprunt.id}) }}"  class="btn btn-secondary">Modifier</a>
+            {{ include('emprunt/_delete_form.html.twig') }}
+        </div>
+    </div>
 
-    {{ include('emprunt/_delete_form.html.twig') }}
+    
 {% endblock %}

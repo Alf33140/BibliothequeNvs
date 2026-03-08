@@ -3,9 +3,13 @@
 {% block title %}New Category{% endblock %}
 
 {% block body %}
-    <h1>Create new Category</h1>
+<div class="container containerForm">
+        <div class="form">
+            <h1>Create new Category</h1>
 
-    {{ include('category/_form.html.twig') }}
+            {{ include('category/_form.html.twig') }}
 
-    <a href="{{ path('app_category_index') }}"  class="btn btn-primary">Revenir à la liste</a>
+            <a href="{{ path('app_category_index') }}"  class="btn btn-primary">Revenir à la liste</a>
+        </div>
+    </div>
 {% endblock %}
