@@ -22,6 +22,9 @@ class Book
     #[ORM\Column(length: 13)]
     private ?string $isbn = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $stock = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class Book
     public function setIsbn(string $isbn): static
     {
         $this->isbn = $isbn;
+
+        return $this;
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?int $stock): static
+    {
+        $this->stock = $stock;
 
         return $this;
     }
