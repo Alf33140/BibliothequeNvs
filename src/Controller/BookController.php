@@ -3,11 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\AddBookHistory;  // Import de la classe AddBookHistory
 use App\Form\BookType;
 use App\Repository\BookRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,46 +27,55 @@ final class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
-    {
-        $book = new Book();
-        $form = $this->createForm(BookType::class, $book);
-        $form->handleRequest($request);
+#[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
+public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+{
+    $book = new Book();
+    $form = $this->createForm(BookType::class, $book);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $image = $form->get('image')->getData();
-            if ($image) {
-                $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME); 
-                $safeImageName = $slugger->slug($originalName);
-                $newFileImageName = $safeImageName.'-'.uniqid().'.'.$image->guessExtension();
-                
-                try { 
-                    $image->move
-                        ($this->getParameter('image_directory'), 
-                        $newFileImageName);
-                }catch (FileException $exception) {}
-                    $book->setImage($newFileImageName); 
-                
+    if ($form->isSubmitted() && $form->isValid()) {
+        /** @var UploadedFile $image */
+        $image = $form->get('image')->getData();
+        if ($image) {
+            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME); 
+            $safeImageName = $slugger->slug($originalName);
+            $newFileImageName = $safeImageName.'-'.uniqid().'.'.$image->guessExtension();
+            
+            try { 
+                $image->move(
+                    $this->getParameter('image_directory'), 
+                    $newFileImageName
+                );
+                $book->setImage($newFileImageName); 
+            } catch (FileException $exception) {
+                // Gestion de l'erreur
             }
-            $entityManager->persist($book);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('book/new.html.twig', [
-            'form' => $form,
-        ]);
+        // --- PREMIER FLUSH (Pour enregistrer le Livre) ---
+        $entityManager->persist($book);
+        $entityManager->flush(); 
+
+        // --- DEUXIÈME PARTIE : HISTORIQUE ---
+        $stockHistory = new AddBookHistory(); // Correction du "=" et de la variable
+        $stockHistory->setQuantity($book->getStock());
+        $stockHistory->setBook($book);
+        $stockHistory->setCreatedAt(new \DateTimeImmutable()); // Ajout du "set" et du "\"
+        
+        // --- SECOND FLUSH (Pour enregistrer l'historique) ---
+        $entityManager->persist($stockHistory);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Votre livre a été ajouté'); // Correction du ";"
+        
+        return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}', name: 'app_book_show', methods: ['GET'])]
-    public function show(Book $book): Response
-    {
-        return $this->render('book/show.html.twig', [
-            'book' => $book,
-        ]);
-    }
+    return $this->render('book/new.html.twig', [
+        'form' => $form,
+    ]);
+}
 
     #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
