@@ -5,11 +5,11 @@
 {% block body %}
     <div class="container containerForm">
         <div class="form">
-            <h1>Edit Emprunt</h1>
+            <h1>Emprunt</h1>
 
             {{ include('emprunt/_form.html.twig', {'button_label': 'Update'}) }}
 
-            <a href="{{ path('app_emprunt_index') }}"  class="btn btn-primary">Revenir à la listet</a>
+            <a href="{{ path('app_emprunt_index') }}"  class="btn btn-primary">Revenir à la liste</a>
 
             {{ include('emprunt/_delete_form.html.twig') }}
         </div>

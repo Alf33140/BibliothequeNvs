@@ -5,30 +5,43 @@
 {% block body %}
     <div class="container containerForm">
         <div class="form">
-            <h1>Book index</h1>
+            <h1>Liste des Livres disponibles</h1>
 
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Id</th>
+                        
                         <th>Titre</th>
                         <th>Auteur</th>
+                        <th>Decription</th>
                         <th>Categorie</th>
                         <th>Isbn</th>
+                        <th>Image</th>
+                        <th>Stock disponible</th>
                         <th>actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for book in books %}
                     <tr>
-                        <td>{{ book.id }}</td>
+                        
                         <td>{{ book.titre }}</td>
                         <td>{{ book.auteur }}</td>
+                        <td>{{ book.description|slice(0,100) }}</td>
                         <td>{{ book.category.categorie }}</td>
                         <td>{{ book.isbn }}</td>
                         <td>{{ book.image }}</td>
+                        
                         <td>
-                            <a href="{{ path('app_book_show', {'id': book.id}) }}"  class="btn btn-primary">show</a>
+                            {% if book.stock > 0  %}
+                                {{ book.stock }}
+                                
+                            {% else %}
+                            <span class="text-danger">Pas d'emprunt possible</span>
+                    {% endif %}
+                </td>
+                        <td>
+                            <a href="{{ path('app_book_show', {'id': book.id}) }}"  class="btn btn-primary">Visualiser</a>
                             <a href="{{ path('app_book_edit', {'id': book.id}) }}"  class="btn btn-secondary">Modifier</a>
                         </td>
                     </tr>

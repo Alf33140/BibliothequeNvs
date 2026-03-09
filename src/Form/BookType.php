@@ -18,9 +18,11 @@ class BookType extends AbstractType
         $builder
             ->add('titre')
             ->add('auteur')
+            ->add('description')
             ->add('isbn')
+            ->add('stock')
             ->add('image', FileType::class, [
-                'label'=> 'Image du Produit',
+                'label'=> 'Image du Livre',
                 'mapped' => false,
                 'required'=> false,
                 'constraints' => [
@@ -29,10 +31,11 @@ class BookType extends AbstractType
                         mimeTypes: [
                             'image/jpeg',
                             'image/png',
+                            'image/jpg',
                             'image/gif',
                         ],
                         maxSizeMessage: 'La taille du fichier ne doit pas dépasser 1 Mo.',
-                        mimeTypesMessage: 'Veuillez choisir un fichier de type image (JPEG, PNG, GIF)!!',
+                        mimeTypesMessage: 'Veuillez choisir un fichier de type image (JPEG, PNG,JPG, GIF)!!',
                     ),
                 ],
             ])

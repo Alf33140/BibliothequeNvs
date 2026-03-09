@@ -1,8 +1,10 @@
 {{ form_start(form) }}
     {{ form_row(form.titre, {'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.auteur, {'attr':{'class':'form form-control'}}) }}
+    {{ form_row(form.description, {'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.isbn, {'attr':{'class':'form form-control'}}) }}
+    {{ form_row(form.stock, {'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.image, {'attr':{'class':'form form-control'}}) }}
 
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <button class="btn">{{ button_label|default('Sauvegarder') }}</button>
 {{ form_end(form) }}

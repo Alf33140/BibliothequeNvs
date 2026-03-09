@@ -14,7 +14,10 @@
                         <th>Id</th>
                         <th>DateEmprunt</th>
                         <th>DateRetour</th>
+                        <th>Livre</th>
                         <th>Status</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
                         <th>actions</th>
                     </tr>
                 </thead>
@@ -24,7 +27,10 @@
                         <td>{{ emprunt.id }}</td>
                         <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('Y-m-d H:i:s') : '' }}</td>
                         <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ emprunt.book.id }}</td>
                         <td>{{ emprunt.status }}</td>
+                        <td>{{ emprunt.user.id }}</td>
+                        
                         <td>
                             <a href="{{ path('app_emprunt_show', {'id': emprunt.id}) }}"  class="btn btn-primary">Visualiser</a>
                             <a href="{{ path('app_emprunt_edit', {'id': emprunt.id}) }}"  class="btn btn-secondary">Modifier</a>
@@ -32,12 +38,12 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="5">no records found</td>
+                        <td colspan="5">pas d'emprunt trouvé</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-             <a href="{{ path('app_emprunt_new') }}">Create new</a>
+             <a href="{{ path('app_emprunt_new') }}">Créer un nouvel emprunt</a>
         </div>
     </div>
    
