@@ -6,26 +6,25 @@
 
         <div class="container container-home">
             <div class='container'>
+            
                 <h1>Notre catalogue de livres </h1> 
-                    
-                    <h2>Liste des livres</h2>
             
                 <table class="table">
                     <tbody>
-                        {# <div class="row">
+                        <div class="row">
                             {% for book in books %}
                                 <div class="card" style="width: 18rem;">
-                                    <img src="{{ book.image }}" class="card-img-top">
+                                    <img src="{{ asset('uploads/images/' ~ book.image) }}" class="card-img-top" alt="{{ book.titre }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ book.titre }}</h5>
-                                        <p class="card-text">{{ book.auteur }}</p>
-                                        <p class="card-text">{{ book.isbn }} Thunes</p>
+                                        <p class="card-text">Auteur:{{ book.auteur }}</p>
+                                        <p class="card-text">isbn:{{ book.isbn }}</p>
                                         <p class="card-text">Stock: {{ book.stock }}</p>
-                                        <a href="#" class="btn btn-primary">faire un emprunt</a>
+                                        <a href="{{ path('app_emprunt_new', {'book_id': book.id}) }}" class="btn btn-primary">Faire un emprunt</a>
                                     </div>
                                 </div>
                             {% endfor %}
-                        </div> #}
+                        </div>
                 </table>
             </div>
         

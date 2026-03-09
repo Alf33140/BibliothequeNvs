@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Emprunt;
 use App\Form\EmpruntType;
+use App\Repository\BookRepository;
 use App\Repository\EmpruntRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,9 +24,23 @@ final class EmpruntController extends AbstractController
     }
 
     #[Route('/editor/new', name: 'app_emprunt_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository): Response
     {
         $emprunt = new Emprunt();
+        
+        // 1. Récupération de l'utilisateur connecté
+        $user = $this->getUser();
+        $emprunt->setUser($user);
+
+        // 2. Gestion du pré-remplissage du livre via l'URL (?book_id=...)
+        $bookId = $request->query->get('book_id');
+        if ($bookId) {
+            $book = $bookRepository->find($bookId);
+            if ($book) {
+                $emprunt->setBook($book);
+            }
+        }
+
         $form = $this->createForm(EmpruntType::class, $emprunt);
         $form->handleRequest($request);
 

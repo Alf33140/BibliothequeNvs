@@ -30,6 +30,7 @@ class Emprunt
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+   
     public function getId(): ?int
     {
         return $this->id;
@@ -94,4 +95,6 @@ class Emprunt
 
         return $this;
     }
+
+    
 }

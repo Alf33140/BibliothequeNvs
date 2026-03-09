@@ -22,6 +22,14 @@
                         <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i:s') : '' }}</td>
                     </tr>
                     <tr>
+                        <th>Livre</th>
+                        <td>{{ emprunt.book.titre|default('Non renseigné') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Emprunteur</th>
+                        <td>{{ emprunt.user.firstname }} {{ emprunt.user.lastname }}</td>
+                    </tr>
+                    <tr>
                         <th>Status</th>
                         <td>{{ emprunt.status }}</td>
                     </tr>

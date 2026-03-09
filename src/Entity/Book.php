@@ -48,6 +48,15 @@ class Book
         $this->emprunts = new ArrayCollection();
     }
 
+    /**
+     * Cette méthode permet à Symfony de transformer l'objet en texte automatiquement.
+     * Très utile pour les formulaires et les affichages Twig.
+     */
+    public function __toString(): string
+    {
+        return $this->titre ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,7 +143,7 @@ class Book
     public function removeEmprunt(Emprunt $emprunt): static
     {
         if ($this->emprunts->removeElement($emprunt)) {
-            // set the owning side to null (unless already changed)
+
             if ($emprunt->getBook() === $this) {
                 $emprunt->setBook(null);
             }

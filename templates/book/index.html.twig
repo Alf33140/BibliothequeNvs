@@ -37,12 +37,13 @@
                                 {{ book.stock }}
                                 
                             {% else %}
-                            <span class="text-danger">Pas d'emprunt possible</span>
+                            <span class="text-danger">Pas d'emprunt possible -Plus aucun exemplaire disponible</span>
                     {% endif %}
                 </td>
                         <td>
                             <a href="{{ path('app_book_show', {'id': book.id}) }}"  class="btn btn-primary">Visualiser</a>
                             <a href="{{ path('app_book_edit', {'id': book.id}) }}"  class="btn btn-secondary">Modifier</a>
+                            <a href=" "  class="btn btn-secondary">Ajout de stock</a>
                         </td>
                     </tr>
                 {% else %}

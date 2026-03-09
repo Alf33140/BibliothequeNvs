@@ -91,6 +91,11 @@ final class BookController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
+
+            return $this->render('book/edit.html.twig', [#on rend la vue du formulaire de modification du produit. On passe à la vue l'entité du produit à modifier et le formulaire lui-même pour qu'il puisse être affiché dans la page.
+            'book' => $book,#on passe à la vue l'entité du produit à modifier pour qu'elle puisse être utilisée dans le template, par exemple pour pré-remplir les champs du formulaire avec les données actuelles du produit.
+            'form' => $form,#on passe à la vue le formulaire lui-même pour qu'il puisse être affiché dans la page. Le formulaire contiendra les champs nécessaires pour modifier les informations du produit, et il sera lié à l'entité du produit pour que les données saisies soient automatiquement mappées à l'entité lors de la soumission du formulaire.
+        ]);
         }
 
         return $this->render('book/edit.html.twig', [

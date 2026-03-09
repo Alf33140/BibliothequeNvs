@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Book;
 use App\Entity\Emprunt;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,8 +20,21 @@ class EmpruntType extends AbstractType
             ])
             ->add('dateRetour', null, [
                 'widget' => 'single_text',
+                'required' => false, 
             ])
             ->add('status')
+            ->add('book', EntityType::class, [
+                'class' => Book::class,
+                'choice_label' => 'titre', 
+                'label' => 'Sélectionner le livre',
+                'placeholder' => 'Choisissez un livre',
+            ])
+            ->add('user', EntityType::class, [ 
+                'class' => User::class,
+                'choice_label' => 'lastname', 
+                'label' => 'Emprunteur',
+                'placeholder' => 'Choisissez un utilisateur',
+            ])
         ;
     }
 
