@@ -71,7 +71,7 @@ class Emprunt
 
         return $this;
     }
-
+    
     public function getBook(): ?Book
     {
         return $this->book;

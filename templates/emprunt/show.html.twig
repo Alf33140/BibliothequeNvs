@@ -30,9 +30,21 @@
                         <td>{{ emprunt.user.firstname }} {{ emprunt.user.lastname }}</td>
                     </tr>
                     <tr>
-                        <th>Status</th>
-                        <td>{{ emprunt.status }}</td>
+                        <th>Statut</th>
+                        <td>
+                            {% if emprunt.dateRetour %}
+                                {# On compare la date de retour avec la date du jour #}
+                                {% if emprunt.dateRetour < date() %}
+                                    <span class="badge bg-danger">En retard</span>
+                                {% else %}
+                                    <span class="badge bg-success">En cours</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Statut inconnu</span>
+                            {% endif %}
+                        </td>
                     </tr>
+                    
                 </tbody>
             </table>
             <a href="{{ path('app_emprunt_index') }}"  class="btn btn-primary">Revenir à la liste</a>

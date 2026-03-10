@@ -6,6 +6,7 @@ use App\Entity\Emprunt;
 use App\Form\EmpruntType;
 use App\Repository\BookRepository;
 use App\Repository\EmpruntRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +33,7 @@ final class EmpruntController extends AbstractController
         $user = $this->getUser();
         $emprunt->setUser($user);
 
-        // 2. Gestion du pré-remplissage du livre via l'URL (?book_id=...)
+        
         $bookId = $request->query->get('book_id');
         if ($bookId) {
             $book = $bookRepository->find($bookId);
@@ -93,4 +94,5 @@ final class EmpruntController extends AbstractController
 
         return $this->redirectToRoute('app_emprunt_index', [], Response::HTTP_SEE_OTHER);
     }
+   
 }

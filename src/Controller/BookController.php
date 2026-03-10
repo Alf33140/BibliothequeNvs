@@ -2,12 +2,16 @@
 
 namespace App\Controller;
 
+ 
 use App\Entity\Book;
-use App\Entity\AddBookHistory;  // Import de la classe AddBookHistory
+use App\Entity\Stock; // Import de la classe de l'entité Stock pour gerer l'historique
 use App\Form\BookType;
 use App\Repository\BookRepository;
+use App\Repository\StockRepository;
+use App\Form\StockHistoryType;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Id;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -48,31 +52,32 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
                     $newFileImageName
                 );
                 $book->setImage($newFileImageName); 
-            } catch (FileException $exception) {
-                // Gestion de l'erreur
+            } catch (FileException $exception) { // Gestion de l'erreur
+                
             }
         }
-
-        // --- PREMIER FLUSH (Pour enregistrer le Livre) ---
+    
         $entityManager->persist($book);
         $entityManager->flush(); 
-
-        // --- DEUXIÈME PARTIE : HISTORIQUE ---
-        $stockHistory = new AddBookHistory(); // Correction du "=" et de la variable
-        $stockHistory->setQuantity($book->getStock());
-        $stockHistory->setBook($book);
-        $stockHistory->setCreatedAt(new \DateTimeImmutable()); // Ajout du "set" et du "\"
+      
         
-        // --- SECOND FLUSH (Pour enregistrer l'historique) ---
-        $entityManager->persist($stockHistory);
-        $entityManager->flush();
+            $stockHistory = new Stock(); 
+            $stockHistory->setQuantity($book->getStock());
+            $stockHistory->setLivre($book);
+            $stockHistory->setCreatedAt(new \DateTimeImmutable()); 
+    
+            $entityManager->persist($stockHistory);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Votre livre a été ajouté'); // Correction du ";"
+        
+
+        $this->addFlash('success', 'Votre livre a été ajouté'); // Message Flash pour confirmer l'jout du livre"
         
         return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
     }
 
     return $this->render('book/new.html.twig', [
+        'book' => $book,
         'form' => $form,
     ]);
 }
@@ -89,13 +94,13 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
    
             if ($image) {/*si l'image existe*/
                 $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeImageName = $slugger->slug($originalName);/* permet de recup des image avec espace dans le nom et l'enlever*/
+                $safeImageName = $slugger->slug($originalName);/* permet de recup des images avec espace dans le nom et le concatener*/
                 $newFileImageName = $safeImageName.'-'.uniqid().'.'.$image->guessExtension();/*cree un id unique a toute les images meme si elles ont un nom similaire*/
 
                 try {
                     $image->move
                         ($this->getParameter('image_directory'),
-                        $newFileImageName);/* on recup l'image et on la renomme et on la stocke dans le repoertoire */
+                        $newFileImageName);/* on recup l'image, on la renomme et on la stocke dans le repoertoire */
                 }catch (FileException $exception) {}/*en cas d'erreur*/
                     $book->setImage($newFileImageName);
                 
@@ -104,10 +109,7 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
 
             return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
 
-            return $this->render('book/edit.html.twig', [#on rend la vue du formulaire de modification du produit. On passe à la vue l'entité du produit à modifier et le formulaire lui-même pour qu'il puisse être affiché dans la page.
-            'book' => $book,#on passe à la vue l'entité du produit à modifier pour qu'elle puisse être utilisée dans le template, par exemple pour pré-remplir les champs du formulaire avec les données actuelles du produit.
-            'form' => $form,#on passe à la vue le formulaire lui-même pour qu'il puisse être affiché dans la page. Le formulaire contiendra les champs nécessaires pour modifier les informations du produit, et il sera lié à l'entité du produit pour que les données saisies soient automatiquement mappées à l'entité lors de la soumission du formulaire.
-        ]);
+            
         }
 
         return $this->render('book/edit.html.twig', [
@@ -115,8 +117,19 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
             'form' => $form,
         ]);
     }
+    #region Show
+   #[Route('/{id}', name: 'app_book_show', methods: ['GET', 'POST'])]
+    public function show( Book $book): Response
+    {
+    
 
-    #[Route('/{id}', name: 'app_book_delete', methods: ['POST'])]
+        // Vérifie bien si ton dossier est 'book' ou 'product'
+        return $this->render('book/show.html.twig', [
+            'book' => $book,
+        ]);
+    }
+
+    #[Route('/admin/{id}', name: 'app_book_delete', methods: ['POST'])]
     public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->getPayload()->getString('_token'))) {
@@ -125,5 +138,54 @@ public function new(Request $request, EntityManagerInterface $entityManager, Slu
         }
 
         return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
+    }
+     #[Route('/add/book/{id}/', name:'app_book_stock_add', methods: ['GET','POST'])]
+    public function addStock(Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository, $id): Response 
+    { 
+        $book = $bookRepository->find($id);
+        if (!$book) {
+            throw $this->createNotFoundException('Livre non trouvé');
+        }
+
+        $stockAdd = new Stock();
+        $form = $this->createForm(StockHistoryType::class, $stockAdd);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()) {
+            if($stockAdd->getQuantity() > 0){ 
+                $newQuantity = $book->getStock() + $stockAdd->getQuantity(); 
+                $book->setStock($newQuantity);
+                $stockAdd->setCreatedAt(new \DateTimeImmutable());
+                $stockAdd->setLivre($book); // Utilisation du champ 'livre'
+
+                $entityManager->persist($stockAdd);
+                $entityManager->flush();
+
+                $this->addFlash('success','Le stock du produit a été modifié');
+                return $this->redirectToRoute('app_book_index');
+            } else {
+                $this->addFlash('error','La quantité doit être supérieure à 0'); // Suppression du 'e' parasite
+                return $this->redirectToRoute('app_book_stock', ['id' => $book->getId()]);
+            }
+        }
+
+        return $this->render('book/addstock.html.twig', [
+            'form' => $form->createView(), 
+            'book' => $book, 
+        ]);
+    }
+
+    #[Route('/add/book/{id}/stock/history', name:'app_stock_add_history', methods: ['GET','POST'])]
+    public function showHistoryBookStock($id, BookRepository $bookRepository, StockRepository $stockRepository): Response
+    {
+        $book = $bookRepository->find($id);
+        
+        // CORRECTION ICI : 'livre' au lieu de 'book'
+        $stockHistory = $stockRepository->findBy(['livre' => $book], ['id' => 'DESC']);
+        
+        return $this->render('book/showHistory.html.twig', [ // Chemin harmonisé en 'book/'
+           'stockHistories' => $stockHistory,
+           'book' => $book // Utile pour afficher le titre du livre dans le template
+        ]);
     }
 }

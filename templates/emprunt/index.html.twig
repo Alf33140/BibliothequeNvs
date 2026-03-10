@@ -5,18 +5,18 @@
 {% block body %}
     <div class="container containerForm">
         <div class="form">
-            <h1>Emprunt index</h1>
+            <h1>Gestion des emprunts</h1>
 
             <table class="table">
+          
                 <thead>
                     <tr>
                         <th>Id</th>
                         <th>Date Emprunt</th>
                         <th>Date Retour</th>
                         <th>Livre</th>
-                        <th>Status</th>
+                        <th>Statut</th>
                         <th>Utilisateur (ID)</th>
-                        <th>Nom & Prénom</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -28,10 +28,10 @@
                         <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('Y-m-d H:i') : '' }}</td>
                         <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i') : '' }}</td>
                         {# On remet dans l'ordre des colonnes : Livre puis Status #}
-                        <td>{{ emprunt.book.id }}</td>
+                        <td>{{ emprunt.book.titre }}</td>
                         {# <td>{{ emprunt.book.titre|default('Sans titre') }}</td> #}
                         <td>{{ emprunt.status }}</td>
-                        <td>{{ emprunt.user.id }}</td>
+                        <td>{{ emprunt.user.lastname }}</td>
                         {# <td>{{ emprunt.user.firstname }} {{ emprunt.user.lastname }}</td> #}
                         
                         <td>

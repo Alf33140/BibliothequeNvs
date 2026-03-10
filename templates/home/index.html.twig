@@ -14,13 +14,14 @@
                         <div class="row">
                             {% for book in books %}
                                 <div class="card" style="width: 18rem;">
-                                    <img src="{{ asset('uploads/images/' ~ book.image) }}" class="card-img-top" alt="{{ book.titre }}">
+                                    <img src="{{ asset('uploads/images/' ~ book.image) }}" class="card-img-top book-thumbnail img-thumbnail"" alt="{{ book.titre }}">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ book.titre }}</h5>
                                         <p class="card-text">Auteur:{{ book.auteur }}</p>
                                         <p class="card-text">isbn:{{ book.isbn }}</p>
                                         <p class="card-text">Stock: {{ book.stock }}</p>
                                         <a href="{{ path('app_emprunt_new', {'book_id': book.id}) }}" class="btn btn-primary">Faire un emprunt</a>
+                                        <a href="{{ path('app_book_show', {'book_id': book.id}) }}" class="btn btn-primary">voir le livre</a>
                                     </div>
                                 </div>
                             {% endfor %}

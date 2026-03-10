@@ -5,28 +5,28 @@
 {% block body %}
     <div class="container containerForm">
         <div class="form">
-            <h1>Book</h1>
+            <h1><h1>Détails du livre n° {{ book.id }}</h1></h1>
 
             <table class="table">
-                <tbody>
-                    <tr>
-                        <th>Id</th>
-                        <td>{{ book.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Titre</th>
-                        <td>{{ book.titre }}</td>
-                    </tr>
-                    <tr>
-                        <th>Auteur</th>
-                        <td>{{ book.auteur }}</td>
-                    </tr>
-                    <tr>
-                        <th>Isbn</th>
-                        <td>{{ book.isbn }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <tbody>
+                <tr>
+                    <th>Id</th>
+                    <th>Titre</th>
+                    <th>Description du produit</th>
+                    <th>Isbn</th>
+                    <th>Stock</th>
+                    
+                </tr>
+                <tr>
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.titre }}</td>
+                    <td>{{ book.description }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>{{ book.stock }}</td>
+                </tr>
+                
+            </tbody>
+        </table>
             <a href="{{ path('app_book_index') }}"  class="btn btn-primary">Revenir à la liste</a>
 
             <a href="{{ path('app_book_edit', {'id': book.id}) }}"  class="btn btn-secondary">Modifier</a>

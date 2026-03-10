@@ -3,18 +3,17 @@
 {% block title %}Book index{% endblock %}
 
 {% block body %}
-    <div class="container containerForm">
+    <div class="container containerForm marge">
         <div class="form">
             <h1>Liste des Livres disponibles</h1>
 
             <table class="table">
                 <thead>
                     <tr>
-                        
+                        <th>Categorie</th>
                         <th>Titre</th>
                         <th>Auteur</th>
                         <th>Decription</th>
-                        <th>Categorie</th>
                         <th>Isbn</th>
                         <th>Image</th>
                         <th>Stock disponible</th>
@@ -24,26 +23,38 @@
                 <tbody>
                 {% for book in books %}
                     <tr>
-                        
+                        <td>{{ book.category.categorie }}</td>
                         <td>{{ book.titre }}</td>
                         <td>{{ book.auteur }}</td>
                         <td>{{ book.description|slice(0,100) }}</td>
-                        <td>{{ book.category.categorie }}</td>
                         <td>{{ book.isbn }}</td>
-                        <td>{{ book.image }}</td>
-                        
                         <td>
-                            {% if book.stock > 0  %}
+                        {% if book.image %} {# On affiche l'image avec l'effet miniature Bootstrap  #}
+                            {# 
+                            On applique une classe CSS personnalisée 'book-thumbnail'
+                            On ajoute aussi la classe Bootstrap 'img-thumbnail' pour la bordure grise 
+                            #}
+                            <img src="{{ asset('uploads/images/' ~ book.image) }}" 
+                                class="book-thumbnail img-thumbnail"
+                                alt="Couverture de {{ book.titre }}">
+                        {% else %}
+                            <span class="text-muted">Pas d'image</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if book.stock >0 %}
                                 {{ book.stock }}
-                                
                             {% else %}
-                            <span class="text-danger">Pas d'emprunt possible -Plus aucun exemplaire disponible</span>
-                    {% endif %}
-                </td>
+                                <span class="text-danger">Stock epuisé pas d'emprunt possible pour le moment</span>
+                            {% endif %}
+                        
+                            
+                    
+                        </td>
                         <td>
                             <a href="{{ path('app_book_show', {'id': book.id}) }}"  class="btn btn-primary">Visualiser</a>
-                            <a href="{{ path('app_book_edit', {'id': book.id}) }}"  class="btn btn-secondary">Modifier</a>
-                            <a href=" "  class="btn btn-secondary">Ajout de stock</a>
+                            <a class="btn btn-outline-success" onclick=" return confirm('Voulez vous vraiment modifier le Livre ?')" href="{{ path('app_book_edit', {'id': book.id}) }}">Modifier</a>
+                            <a href="{{ path('app_book_stock_add', {'id': book.id}) }}"  class="btn btn-secondary">Ajout de stock</a>
                         </td>
                     </tr>
                 {% else %}
