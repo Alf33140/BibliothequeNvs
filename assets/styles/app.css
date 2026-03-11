@@ -1,19 +1,32 @@
+/* LE FOND */
 body {
     background-image: url("background.png") !important;
-    
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center center;
+    background-size: cover !important;
+    background-attachment: fixed !important;
+    background-position: center center !important;
     min-height: 100vh;
     margin: 0;
-    color: #ffffff; 
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Optionnel : ajoute une ombre pour que ce soit lisible sur le bois */
+}
+.row {
+    justify-content: space-around; /* Espace les colonnes entre elles */
+}
+/* LA CARTE */
+.card.custom-card {
+    border-radius: 40px !important;
+    background-color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    overflow: hidden !important;
+    
 }
 
-.containerForm{
-	display: flex;
-	align-items: center;
-	justify-content: space-around;
-	width: 100%;
-    /* height: 100vh; */
+/* LE TEXTE */
+.custom-card .card-body {
+    padding: 2rem !important;
+    color: #fdfdfd !important;
+    text-shadow: none !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Optionnel : ajoute une ombre pour la lisibilité */
 }

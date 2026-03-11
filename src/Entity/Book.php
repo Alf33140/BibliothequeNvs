@@ -105,7 +105,7 @@ class Book
 
     public function setStock(?int $stock): static
     {
-        $this->stock = $stock;
+        $this->stock = ($stock < 0) ? 0 : $stock;
 
         return $this;
     }

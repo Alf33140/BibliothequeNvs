@@ -13,30 +13,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class EmpruntType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $builder
-            ->add('dateEmprunt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('dateRetour', null, [
-                'widget' => 'single_text',
-                'required' => false, 
-            ])
-            ->add('status')
-            ->add('book', EntityType::class, [
-                'class' => Book::class,
-                'choice_label' => 'titre', 
-                'label' => 'Sélectionner le livre',
-                'placeholder' => 'Choisissez un livre',
-            ])
-            ->add('user', EntityType::class, [ 
-                'class' => User::class,
-                'choice_label' => 'lastname', 
-                'label' => 'Emprunteur',
-                'placeholder' => 'Choisissez un utilisateur',
-            ])
-        ;
-    }
+{
+    $builder
+        ->add('dateEmprunt', null, [
+            'widget' => 'single_text',
+        ])
+        ->add('dateRetour', null, [
+            'widget' => 'single_text',
+            'required' => false,
+        ])
+        // SURTOUT PAS DE CHAMP STATUS ICI
+        ->add('book', EntityType::class, [
+            'class' => Book::class,
+            'choice_label' => 'titre',
+        ])
+        ->add('user', EntityType::class, [
+            'class' => User::class,
+            'choice_label' => 'lastname',
+        ])
+    ;
+}
 
     public function configureOptions(OptionsResolver $resolver): void
     {

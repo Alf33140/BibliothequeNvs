@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des Emprunts{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Historique par Emprunteur</h1>
+
+    <table class="table table-bordered shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Livre</th>
+                <th>Date Emprunt</th>
+                <th>Date Retour Prévue</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set dernierUtilisateur = null %}
+            {% for emprunt in emprunts %}
+                
+                {# Séparation par utilisateur #}
+                {% if dernierUtilisateur != emprunt.user.id %}
+                    <tr class="table-secondary">
+                        <td colspan="4"><strong>👤 {{ emprunt.user.lastname|upper }} {{ emprunt.user.firstname }}</strong></td>
+                    </tr>
+                    {% set dernierUtilisateur = emprunt.user.id %}
+                {% endif %}
+
+                <tr>
+                    <td>{{ emprunt.book.titre }}</td>
+                    <td>{{ emprunt.dateEmprunt|date('d/m/Y') }}</td>
+                    <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('d/m/Y') : 'Non renseignée' }}</td>
+                    <td>
+                        {% if emprunt.status == 'Rendu' %}
+                            <span class="badge bg-success text-white">RENDU</span>
+                        
+                        {# Si c'est "En cours" mais que la date de retour est passée #}
+                        {% elseif emprunt.status == 'En cours' and emprunt.dateRetour < aujourdhui %}
+                            <span class="badge bg-danger text-white">EN RETARD</span>
+                        
+                        {% else %}
+                            <span class="badge bg-warning text-dark">EN COURS</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">pad d'emprunt enregistré.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

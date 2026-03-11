@@ -1,4 +1,27 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Sauvegarder') }}</button>
+    <div class="form-container">
+        <div class="mb-3">
+            {{ form_row(form.book) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.user) }}
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.dateEmprunt) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_row(form.dateRetour) }}
+            </div>
+        </div>
+
+        {# Affiche uniquement le jeton CSRF caché #}
+        {{ form_rest(form) }}
+
+        <div class="text-center mt-4">
+            <button class="btn btn-success px-5 shadow">
+                Confirmer l'emprunt
+            </button>
+        </div>
+    </div>
 {{ form_end(form) }}

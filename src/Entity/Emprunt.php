@@ -19,8 +19,9 @@ class Emprunt
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dateRetour = null;
 
+    // --- LE STATUT EST INITIALISÉ PAR DÉFAUT ICI ---
     #[ORM\Column(length: 50)]
-    private ?string $status = null;
+    private ?string $status = 'En cours';
 
     #[ORM\ManyToOne(inversedBy: 'emprunts')]
     #[ORM\JoinColumn(nullable: false)]
@@ -30,7 +31,12 @@ class Emprunt
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-   
+    // --- LE CONSTRUCTEUR INITIALISE LA DATE À LA CRÉATION ---
+    public function __construct()
+    {
+        $this->dateEmprunt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +101,4 @@ class Emprunt
 
         return $this;
     }
-
-    
 }

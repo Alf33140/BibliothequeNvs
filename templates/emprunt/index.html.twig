@@ -1,54 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Emprunt index{% endblock %}
+{% block title %}Gestion des Emprunts{% endblock %}
 
 {% block body %}
-    <div class="container containerForm">
-        <div class="form">
-            <h1>Gestion des emprunts</h1>
+<div class="container">
+    <h1 class="mb-5 text-center" style="color: white; text-shadow: 2px 2px 4px #000;">
+        Gestion des emprunts
+    </h1>
 
-            <table class="table">
-          
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Date Emprunt</th>
-                        <th>Date Retour</th>
-                        <th>Livre</th>
-                        <th>Statut</th>
-                        <th>Utilisateur (ID)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {# Début de la boucle #}
-                {% for emprunt in emprunts %}
-                    <tr>
-                        <td>{{ emprunt.id }}</td>
-                        <td>{{ emprunt.dateEmprunt ? emprunt.dateEmprunt|date('Y-m-d H:i') : '' }}</td>
-                        <td>{{ emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d H:i') : '' }}</td>
-                        {# On remet dans l'ordre des colonnes : Livre puis Status #}
-                        <td>{{ emprunt.book.titre }}</td>
-                        {# <td>{{ emprunt.book.titre|default('Sans titre') }}</td> #}
-                        <td>{{ emprunt.status }}</td>
-                        <td>{{ emprunt.user.lastname }}</td>
-                        {# <td>{{ emprunt.user.firstname }} {{ emprunt.user.lastname }}</td> #}
+    <div class="row" style="justify-content: space-around;">
+        {% for emprunt in emprunts %}
+            <div class="col-md-4 mb-4 p-3"> 
+                <div class="card custom-card h-100 shadow">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-primary">{{ emprunt.book.titre }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            👤 {{ emprunt.user.firstname }} {{ emprunt.user.lastname|upper }}
+                        </h6>
                         
-                        <td>
-                            <a href="{{ path('app_emprunt_show', {'id': emprunt.id}) }}" class="btn btn-primary">Visualiser</a>
-                            <a href="{{ path('app_emprunt_edit', {'id': emprunt.id}) }}" class="btn btn-secondary">Modifier</a>
-                        </td>
-                    </tr>
-                {% else %}
-                    {# Ce bloc s'affiche uniquement si la liste 'emprunts' est vide #}
-                    <tr>
-                        <td colspan="8">Pas d'emprunt trouvé</td>
-                    </tr>
-                {% endfor %} {# On ferme le FOR ici #}
-                </tbody>
-            </table>
+                        {# --- AFFICHAGE DU STOCK --- #}
+                        <div class="mb-2">
+                            <span class="badge bg-light text-dark border">
+                                📦 Stock actuel : {{ emprunt.book.stock }}
+                            </span>
+                        </div>
+                        
+                        <hr>
 
-            <a href="{{ path('app_emprunt_new') }}" class="btn btn-success">Créer un nouvel emprunt</a>
-        </div>
+                        {# --- CALCUL AUTOMATIQUE DU STATUT --- #}
+                        {% set dateToday = "now"|date('Y-m-d') %}
+                        {% set dateRetour = emprunt.dateRetour ? emprunt.dateRetour|date('Y-m-d') : null %}
+
+                        <p class="card-text">
+                            <strong>Date de retour :</strong> {{ emprunt.dateRetour ? emprunt.dateRetour|date('d/m/Y') : 'N/C' }}
+                            <br><br>
+                            <strong>Statut :</strong> 
+                            {% if emprunt.status == 'Rendu' %}
+                                <span class="badge bg-success shadow-sm">Livre Rendu</span>
+                            {% elseif dateRetour and dateRetour < dateToday %}
+                                <span class="badge bg-danger shadow-sm">En Retard</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark shadow-sm">En cours</span>
+                            {% endif %}
+                        </p>
+
+                        <div class="mt-auto d-flex flex-wrap gap-2">
+                            {# BOUTON RENDRE : Uniquement si pas déjà rendu #}
+                            {% if emprunt.status != 'Rendu' %}
+                                <form method="post" action="{{ path('app_emprunt_rendre', {'id': emprunt.id}) }}" onsubmit="return confirm('Confirmer le retour de ce livre ? Cela augmentera le stock de 1.');">
+                                    <button class="btn btn-success btn-sm">
+                                        <i class="bi bi-arrow-return-left"></i> Rendre
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <a href="{{ path('app_emprunt_show', {'id': emprunt.id}) }}" class="btn btn-outline-primary btn-sm">Détails</a>
+                            <a href="{{ path('app_emprunt_edit', {'id': emprunt.id}) }}" class="btn btn-outline-secondary btn-sm">Modifier</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">Aucun emprunt en cours dans la base de données.</div>
+            </div>
+        {% endfor %}
     </div>
+</div>
 {% endblock %}

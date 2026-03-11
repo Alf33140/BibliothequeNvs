@@ -6,17 +6,21 @@ use App\Entity\Emprunt;
 use App\Form\EmpruntType;
 use App\Repository\BookRepository;
 use App\Repository\EmpruntRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/editor/emprunt')]
+#[Route('/emprunt')]
 final class EmpruntController extends AbstractController
 {
+    /**
+     * SEULS L'ADMIN ET L'EDITOR PEUVENT VOIR LA LISTE
+     */
     #[Route(name: 'app_emprunt_index', methods: ['GET'])]
+    #[IsGranted('ROLE_EDITOR')] 
     public function index(EmpruntRepository $empruntRepository): Response
     {
         return $this->render('emprunt/index.html.twig', [
@@ -24,41 +28,117 @@ final class EmpruntController extends AbstractController
         ]);
     }
 
-    #[Route('/editor/new', name: 'app_emprunt_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository): Response
+    /**
+     * TOUT LE MONDE (USER, EDITOR, ADMIN) PEUT ACCÉDER À CETTE ROUTE
+     */
+   #[Route('/new', name: 'app_emprunt_new', methods: ['GET', 'POST'])]
+#[IsGranted('ROLE_USER')]
+public function new(Request $request, EntityManagerInterface $entityManager, BookRepository $bookRepository): Response
+{
+    $emprunt = new Emprunt();
+    $emprunt->setUser($this->getUser());
+
+    $bookId = $request->query->get('book_id');
+    if ($bookId) {
+        $book = $bookRepository->find($bookId);
+        
+        // --- VÉRIFICATION SÉCURITÉ ---
+        if ($book && $book->getStock() <= 0) {
+            $this->addFlash('danger', 'Désolé, le stock de "' . $book->getTitre() . '" est épuisé.');
+            return $this->redirectToRoute('app_home');
+        }
+        
+        if ($book) { $emprunt->setBook($book); }
+    }
+
+    $form = $this->createForm(EmpruntType::class, $emprunt);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $book = $emprunt->getBook(); // Récupère l'objet Book lié via book_id
+
+        // On baisse le stock de 1
+        $book->setStock($book->getStock() - 1);
+        
+        $emprunt->setStatus('En cours');
+        $emprunt->setDateEmprunt(new \DateTimeImmutable());
+
+        $entityManager->persist($emprunt);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Emprunt validé !');
+        return $this->redirectToRoute('app_home');
+    }
+
+    return $this->render('emprunt/new.html.twig', [
+        'emprunt' => $emprunt,
+        'form' => $form,
+    ]);
+}
+#[Route('/{id}/rendre', name: 'app_emprunt_rendre', methods: ['GET', 'POST'])]
+#[IsGranted('ROLE_EDITOR')]
+public function rendre(Emprunt $emprunt, EntityManagerInterface $entityManager): Response
+{
+    // On passe le statut à rendu
+    $emprunt->setStatus('Rendu');
+    
+    // On récupère l'entité Book liée à cet emprunt
+    $book = $emprunt->getBook();
+    
+    if ($book) {
+        // On remet 1 exemplaire en stock
+        $book->setStock($book->getStock() + 1);
+    }
+
+    $entityManager->flush();
+
+    $this->addFlash('success', 'Livre récupéré. Le stock est de nouveau à ' . $book->getStock());
+
+    return $this->redirectToRoute('app_emprunt_index');
+}
+    /**
+     * HISTORIQUE DES EMPRUNTS AVEC CALCUL DU RETARD
+     */
+    #[Route('/historique', name: 'app_emprunt_history', methods: ['GET'])]
+    #[IsGranted('ROLE_EDITOR')]
+    public function history(EmpruntRepository $empruntRepository): Response
     {
-        $emprunt = new Emprunt();
-        
-        // 1. Récupération de l'utilisateur connecté
-        $user = $this->getUser();
-        $emprunt->setUser($user);
+        $emprunts = $empruntRepository->findBy([], [
+            'user' => 'ASC',
+            'dateEmprunt' => 'DESC'
+        ]);
 
-        
-        $bookId = $request->query->get('book_id');
-        if ($bookId) {
-            $book = $bookRepository->find($bookId);
-            if ($book) {
-                $emprunt->setBook($book);
-            }
-        }
+        $aujourdhui = new \DateTimeImmutable();
 
-        $form = $this->createForm(EmpruntType::class, $emprunt);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($emprunt);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_emprunt_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('emprunt/new.html.twig', [
-            'emprunt' => $emprunt,
-            'form' => $form,
+        return $this->render('emprunt/history.html.twig', [
+            'emprunts' => $emprunts,
+            'aujourdhui' => $aujourdhui, // On envoie la date du jour à Twig
         ]);
     }
 
-    #[Route('/editor/{id}', name: 'app_emprunt_show', methods: ['GET'])]
+    #[Route('/mes-emprunts', name: 'app_emprunt_mes_emprunts', methods: ['GET'])]
+#[IsGranted('ROLE_USER')]
+public function mesEmprunts(EmpruntRepository $empruntRepository): Response
+{
+    // On récupère l'utilisateur actuellement connecté
+    $user = $this->getUser();
+
+    // On cherche tous les emprunts liés à cet utilisateur, triés par date récente
+    $mesEmprunts = $empruntRepository->findBy(
+        ['user' => $user],
+        ['dateEmprunt' => 'DESC']
+    );
+
+    return $this->render('emprunt/mes_emprunts.html.twig', [
+        'emprunts' => $mesEmprunts,
+    ]);
+}
+
+    /**
+     * SHOW, EDIT ET DELETE : RESERVÉS À L'EDITOR ET L'ADMIN
+     */
+    #[Route('/{id}', name: 'app_emprunt_show', methods: ['GET'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function show(Emprunt $emprunt): Response
     {
         return $this->render('emprunt/show.html.twig', [
@@ -66,7 +146,8 @@ final class EmpruntController extends AbstractController
         ]);
     }
 
-    #[Route('/editor/{id}/edit', name: 'app_emprunt_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_emprunt_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function edit(Request $request, Emprunt $emprunt, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EmpruntType::class, $emprunt);
@@ -74,8 +155,7 @@ final class EmpruntController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_emprunt_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_emprunt_index');
         }
 
         return $this->render('emprunt/edit.html.twig', [
@@ -84,7 +164,8 @@ final class EmpruntController extends AbstractController
         ]);
     }
 
-    #[Route('/editor/{id}', name: 'app_emprunt_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_emprunt_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(Request $request, Emprunt $emprunt, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$emprunt->getId(), $request->getPayload()->getString('_token'))) {
@@ -92,7 +173,7 @@ final class EmpruntController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_emprunt_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_emprunt_index');
     }
-   
+    
 }
