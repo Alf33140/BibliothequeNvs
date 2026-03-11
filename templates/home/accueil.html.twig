@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Accueil{% endblock %}
+
 {% block body %}
-    <h1>Bienvenue</h1>
-    <p>La page d'accueil fonctionne !</p>
+<div class="container mt-5 text-center">
+    <h1>Bienvenue sur notre Bibliotheque</h1>
+    <p class="lead">Connecté avec succès !</p>
+    <hr>
+    <a href="{{ path('app_book_index') }}" class="btn btn-primary btn-lg">Voir le catalogue</a>
+</div>
 {% endblock %}

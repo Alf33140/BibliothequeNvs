@@ -2,17 +2,21 @@
 
 namespace App\Controller;
 
+use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
 {
-    // On met '/' pour que ce soit la racine du site
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function index(CategoryRepository $categoryRepository): Response
     {
-        // On affiche ton nouveau fichier de présentation
-        return $this->render('home/accueil.html.twig');
+        // On récupère toutes les catégories (qui contiennent leurs livres grâce à la relation)
+        $categories = $categoryRepository->findAll();
+
+        return $this->render('home/accueil.html.twig', [
+            'categories' => $categories, // On envoie la variable attendue par Twig
+        ]);
     }
 }

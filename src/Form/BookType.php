@@ -3,8 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Book;
-use App\Entity\Category; // Ne pas oublier cet import
-use Symfony\Bridge\Doctrine\Form\Type\EntityType; // Ne pas oublier cet import
+use App\Entity\Category;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,7 +18,7 @@ class BookType extends AbstractType
         $builder
             ->add('titre')
             ->add('auteur')
-            ->add('description')
+            // ->add('description') // Mis en commentaire pour éviter l'erreur PropertyNotFound
             ->add('isbn')
             ->add('stock')
             ->add('image', FileType::class, [
@@ -41,7 +41,8 @@ class BookType extends AbstractType
             ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
-                'choice_label' => 'categorie', // Utilise le champ "categorie" de ton entité Category
+                // On utilise 'Categorie' avec la majuscule pour correspondre à ton entité
+                'choice_label' => 'Categorie', 
                 'label' => 'Catégorie du livre'
             ])
         ;

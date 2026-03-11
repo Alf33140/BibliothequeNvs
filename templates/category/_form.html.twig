@@ -1,4 +1,6 @@
 {{ form_start(form) }}
-    {{ form_row(form.category, {'attr':{'class':'form form-control'}}) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    {# On remplace 'category' par 'Categorie' pour correspondre à l'entité et au CategoryType #}
+    {{ form_row(form.Categorie, {'attr':{'class':'form form-control'}}) }}
+    
+    <button class="btn btn-success">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}

@@ -7,6 +7,7 @@ use App\Entity\Stock;
 use App\Form\BookType;
 use App\Form\StockHistoryType;
 use App\Repository\BookRepository;
+use App\Repository\CategoryRepository;
 use App\Repository\StockRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,34 +18,34 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/book')]
 final class BookController extends AbstractController
 {
-    /**
-     * LISTE DES LIVRES
-     */
-    #[Route('/catalogue', name: 'app_book_index', methods: ['GET'])] 
-public function index(BookRepository $bookRepository): Response
-{
-    // Ton fichier index.html.twig contient tes cards, donc on ne change rien ici
-    return $this->render('home/index.html.twig', [
-        'books' => $bookRepository->findAll(),
-    ]);
-}
-    /**
-    * CETTE MÉTHODE VA APPELER TON TABLEAU DE GESTION
-    */
+    // 1. LA PAGE D'ACCUEIL (Bienvenue) - Route fixe en premier
+    #[Route('/', name: 'app_home')]
+    public function accueil(): Response
+    {
+        return $this->render('home/accueil.html.twig');
+    }
+
+    // 2. LE CATALOGUE - Route fixe
+    #[Route('/catalogue', name: 'app_book_index')] 
+    public function index(CategoryRepository $categoryRepository): Response
+    {
+        return $this->render('home/index.html.twig', [
+            'categories' => $categoryRepository->findAll(),
+        ]);
+    }
+
+    // 3. ADMIN GESTION - Route fixe
     #[Route('/admin/gestion', name: 'app_book_admin_index', methods: ['GET'])] 
     public function adminIndex(BookRepository $bookRepository): Response
     {
-    // Ici, on pointe explicitement vers le dossier book/
-    return $this->render('book/index.html.twig', [
-        'books' => $bookRepository->findAll(),
-    ]);
+        return $this->render('book/index.html.twig', [
+            'books' => $bookRepository->findAll(),
+        ]);
     }
-    /**
-     * AJOUT D'UN NOUVEAU LIVRE
-     */
+
+    // 4. NOUVEAU LIVRE - Route fixe
     #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
@@ -63,15 +64,12 @@ public function index(BookRepository $bookRepository): Response
                 try { 
                     $image->move($this->getParameter('image_directory'), $newFileImageName);
                     $book->setImage($newFileImageName); 
-                } catch (FileException $exception) {
-                   
-                }
+                } catch (FileException $exception) {}
             }
         
             $entityManager->persist($book);
             $entityManager->flush(); 
           
-            // Création de l'entrée initiale en stock
             $stockHistory = new Stock(); 
             $stockHistory->setQuantity($book->getStock());
             $stockHistory->setLivre($book);
@@ -90,10 +88,8 @@ public function index(BookRepository $bookRepository): Response
         ]);
     }
 
-    /**
-     * AJOUT DE STOCK (Route précise avant le {id})
-     */
-    #[Route('/stock/add/{id}', name:'app_book_stock_add', methods: ['GET','POST'])]
+    // 5. AJOUT DE STOCK (Contrainte ID nombre)
+    #[Route('/stock/add/{id<\d+>}', name:'app_book_stock_add', methods: ['GET','POST'])]
     public function addStock(Request $request, EntityManagerInterface $entityManager, Book $book): Response 
     { 
         $stockAdd = new Stock();
@@ -124,10 +120,8 @@ public function index(BookRepository $bookRepository): Response
         ]);
     }
 
-    /**
-     * HISTORIQUE DU STOCK (Route précise avant le {id})
-     */
-    #[Route('/stock/history/{id}', name:'app_stock_add_history', methods: ['GET','POST'])]
+    // 6. HISTORIQUE STOCK (Contrainte ID nombre)
+    #[Route('/stock/history/{id<\d+>}', name:'app_stock_add_history', methods: ['GET','POST'])]
     public function showHistoryBookStock(Book $book, StockRepository $stockRepository): Response
     {
         $stockHistory = $stockRepository->findBy(['livre' => $book], ['id' => 'DESC']);
@@ -138,10 +132,8 @@ public function index(BookRepository $bookRepository): Response
         ]);
     }
 
-    /**
-     * MODIFIER UN LIVRE
-     */
-    #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
+    // 7. MODIFIER UN LIVRE (Contrainte ID nombre)
+    #[Route('/{id<\d+>}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(BookType::class, $book);
@@ -169,30 +161,16 @@ public function index(BookRepository $bookRepository): Response
         ]);
     }
 
-    /**
-     * SUPPRIMER UN LIVRE
-     */
-    #[Route('/admin/delete/{id}', name: 'app_book_delete', methods: ['POST'])]
-    public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($book);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_book_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    /**
-     * VOIR UN LIVRE (DOIT ÊTRE EN DERNIER)
-     */
-    #[Route('/{id}', name: 'app_book_show', methods: ['GET'])]
-    public function show(Book $book): Response
-    {
     
 
+    /**
+     * 9. VOIR UN LIVRE (En dernier, avec contrainte nombre)
+     */
+    #[Route('/{id<\d+>}', name: 'app_book_show', methods: ['GET'])]
+    public function show(Book $book): Response
+    {
         return $this->render('book/show.html.twig', [
-            'book' => $book,
+            'book' => $book, // Assure-toi que cette ligne est identique
         ]);
     }
 }

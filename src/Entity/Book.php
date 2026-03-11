@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
@@ -18,161 +16,33 @@ class Book
     #[ORM\Column(length: 255)]
     private ?string $titre = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $auteur = null;
 
-    #[ORM\Column(length: 13)]
+    #[ORM\Column(length: 20)]
     private ?string $isbn = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?int $stock = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Category $category = null;
-
-    /**
-     * @var Collection<int, Emprunt>
-     */
-    #[ORM\OneToMany(targetEntity: Emprunt::class, mappedBy: 'book')]
-    private Collection $emprunts;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $description = null;
+    // La relation vers la catégorie
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'books')]
+    private ?Category $category = null;
 
-    public function __construct()
-    {
-        $this->emprunts = new ArrayCollection();
-    }
-
-    /**
-     * Cette méthode permet à Symfony de transformer l'objet en texte automatiquement.
-     * Très utile pour les formulaires et les affichages Twig.
-     */
-    public function __toString(): string
-    {
-        return $this->titre ?? '';
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getTitre(): ?string
-    {
-        return $this->titre;
-    }
-
-    public function setTitre(string $titre): static
-    {
-        $this->titre = $titre;
-
-        return $this;
-    }
-
-    public function getAuteur(): ?string
-    {
-        return $this->auteur;
-    }
-
-    public function setAuteur(?string $auteur): static
-    {
-        $this->auteur = $auteur;
-
-        return $this;
-    }
-
-    public function getIsbn(): ?string
-    {
-        return $this->isbn;
-    }
-
-    public function setIsbn(string $isbn): static
-    {
-        $this->isbn = $isbn;
-
-        return $this;
-    }
-
-    public function getStock(): ?int
-    {
-        return $this->stock;
-    }
-
-    public function setStock(?int $stock): static
-    {
-        $this->stock = ($stock < 0) ? 0 : $stock;
-
-        return $this;
-    }
-
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Emprunt>
-     */
-    public function getEmprunts(): Collection
-    {
-        return $this->emprunts;
-    }
-
-    public function addEmprunt(Emprunt $emprunt): static
-    {
-        if (!$this->emprunts->contains($emprunt)) {
-            $this->emprunts->add($emprunt);
-            $emprunt->setBook($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEmprunt(Emprunt $emprunt): static
-    {
-        if ($this->emprunts->removeElement($emprunt)) {
-
-            if ($emprunt->getBook() === $this) {
-                $emprunt->setBook(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getImage(): ?string
-    {
-        return $this->image;
-    }
-
-    public function setImage(?string $image): static
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getTitre(): ?string { return $this->titre; }
+    public function setTitre(string $titre): self { $this->titre = $titre; return $this; }
+    public function getAuteur(): ?string { return $this->auteur; }
+    public function setAuteur(string $auteur): self { $this->auteur = $auteur; return $this; }
+    public function getIsbn(): ?string { return $this->isbn; }
+    public function setIsbn(string $isbn): self { $this->isbn = $isbn; return $this; }
+    public function getStock(): ?int { return $this->stock; }
+    public function setStock(int $stock): self { $this->stock = $stock; return $this; }
+    public function getImage(): ?string { return $this->image; }
+    public function setImage(?string $image): self { $this->image = $image; return $this; }
+    public function getCategory(): ?Category { return $this->category; }
+    public function setCategory(?Category $category): self { $this->category = $category; return $this; }
 }

@@ -13,7 +13,6 @@
                         <th>Categorie</th>
                         <th>Titre</th>
                         <th>Auteur</th>
-                        <th>Decription</th>
                         <th>Isbn</th>
                         <th>Image</th>
                         <th>Stock disponible</th>
@@ -23,17 +22,15 @@
                 <tbody>
                 {% for book in books %}
                     <tr>
-                        <td>{{ book.category.categorie }}</td>
+                        {# Correction : On utilise .Categorie avec une majuscule comme dans l'entité #}
+                        <td>{{ book.category.Categorie }}</td>
                         <td>{{ book.titre }}</td>
                         <td>{{ book.auteur }}</td>
-                        <td>{{ book.description|slice(0,100) }}</td>
+                        {# La description reste en commentaire pour éviter l'erreur #}
+                        {# <td>{{ book.description|slice(0,100) }}</td> #}
                         <td>{{ book.isbn }}</td>
                         <td>
-                        {% if book.image %} {# On affiche l'image avec l'effet miniature Bootstrap  #}
-                            {# 
-                            On applique une classe CSS personnalisée 'book-thumbnail'
-                            On ajoute aussi la classe Bootstrap 'img-thumbnail' pour la bordure grise 
-                            #}
+                        {% if book.image %} 
                             <img src="{{ asset('uploads/images/' ~ book.image) }}" 
                                 class="book-thumbnail img-thumbnail"
                                 alt="Couverture de {{ book.titre }}">
@@ -42,30 +39,27 @@
                         {% endif %}
                         </td>
                         <td>
-                            {% if book.stock >0 %}
+                            {% if book.stock > 0 %}
                                 {{ book.stock }}
                             {% else %}
-                                <span class="text-danger">Stock epuisé pas d'emprunt possible pour le moment</span>
+                                <span class="text-danger">Stock épuisé pas d'emprunt possible</span>
                             {% endif %}
-                        
-                            
-                    
                         </td>
                         <td>
-                            <a href="{{ path('app_book_show', {'id': book.id}) }}"  class="btn btn-primary">Visualiser</a>
-                            <a class="btn btn-outline-success" onclick=" return confirm('Voulez vous vraiment modifier le Livre ?')" href="{{ path('app_book_edit', {'id': book.id}) }}">Modifier</a>
-                            <a href="{{ path('app_book_stock_add', {'id': book.id}) }}"  class="btn btn-secondary">Ajout de stock</a>
+                            <a href="{{ path('app_book_show', {'id': book.id}) }}" class="btn btn-primary">Visualiser</a>
+                            <a class="btn btn-outline-success" onclick="return confirm('Voulez vous vraiment modifier le Livre ?')" href="{{ path('app_book_edit', {'id': book.id}) }}">Modifier</a>
+                            <a href="{{ path('app_book_stock_add', {'id': book.id}) }}" class="btn btn-secondary">Ajout de stock</a>
                         </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="5">Pas de livre trouvé</td>
+                        <td colspan="7">Pas de livre trouvé</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
 
-            <a href="{{ path('app_book_new') }}">Create new</a>
+            <a href="{{ path('app_book_new') }}" class="btn btn-dark">Créer un nouveau livre</a>
         </div>
     </div>
 {% endblock %}
