@@ -23,14 +23,25 @@ final class BookController extends AbstractController
     /**
      * LISTE DES LIVRES
      */
-    #[Route('/', name: 'app_book_index', methods: ['GET'])]
-    public function index(BookRepository $bookRepository): Response
+    #[Route('/catalogue', name: 'app_book_index', methods: ['GET'])] 
+public function index(BookRepository $bookRepository): Response
+{
+    // Ton fichier index.html.twig contient tes cards, donc on ne change rien ici
+    return $this->render('home/index.html.twig', [
+        'books' => $bookRepository->findAll(),
+    ]);
+}
+    /**
+    * CETTE MÉTHODE VA APPELER TON TABLEAU DE GESTION
+    */
+    #[Route('/admin/gestion', name: 'app_book_admin_index', methods: ['GET'])] 
+    public function adminIndex(BookRepository $bookRepository): Response
     {
-        return $this->render('book/index.html.twig', [
-            'books' => $bookRepository->findAll(),
-        ]);
+    // Ici, on pointe explicitement vers le dossier book/
+    return $this->render('book/index.html.twig', [
+        'books' => $bookRepository->findAll(),
+    ]);
     }
-
     /**
      * AJOUT D'UN NOUVEAU LIVRE
      */

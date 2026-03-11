@@ -21,7 +21,7 @@
                                         <p class="card-text">isbn:{{ book.isbn }}</p>
                                         <p class="card-text">Stock: {{ book.stock }}</p>
                                         <a href="{{ path('app_emprunt_new', {'book_id': book.id}) }}" class="btn btn-primary">Faire un emprunt</a>
-                                        <a href="{{ path('app_book_show', {'book_id': book.id}) }}" class="btn btn-primary">voir le livre</a>
+                                        <a href="{{ path('app_book_show', {'id': book.id}) }}" class="btn btn-primary">Voir le livre</a>
                                     </div>
                                 </div>
                             {% endfor %}

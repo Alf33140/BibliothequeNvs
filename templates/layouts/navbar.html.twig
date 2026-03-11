@@ -1,67 +1,82 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Bibliotheque NVS</a> 
+    <a class="navbar-brand" href="{{ path('app_home') }}">Bibliotheque NVS</a> 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        
+        {# ACCUEIL #}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Page d'Accueil</a>
         </li>
-       
+        
+        {# CATEGORIES & LIVRES (Pour tous) #}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Categories
+            Librairie
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href=" ">Liste des catégories de livres</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_book_index') }}">Liste des livres</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ path('app_emprunt_new') }}">Faire un emprunt</a></li>
           </ul>
         </li>
-        <li>
+
+        {# ESPACE UTILISATEUR CONNECTE #}
         {% if app.user %}
             <li class="nav-item">
-            <a class="nav-link" href="{{ path('app_emprunt_mes_emprunts') }}">Mes emprunts</a>
+                <a class="nav-link" href="{{ path('app_emprunt_mes_emprunts') }}">Mes emprunts</a>
             </li>
-            {% endif %}
-        </li>
+        {% endif %}
+
+        {# ESPACE ADMIN #}
         {% if is_granted('ROLE_ADMIN') %} 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Admin
+          <a class="nav-link dropdown-toggle text-primary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Administration
           </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{ path('app_category_index') }}">Gestion des Catégories</a></li>
-            <li><a class="dropdown-item" href="{{ path('app_category_new') }}">Ajout des Catégories</a></li>
-            <li><hr class="dropdown-divider"></li> {# trait separateur ds la drop liste #}
-            <li><a class="dropdown-item" href="{{ path('app_book_index') }}">Gestion des livres</a></li>
-            <li><a class="dropdown-item" href="{{ path('app_book_new') }}">Ajout de livre</a></li>
-            <li><hr class="dropdown-divider"></li> {# trait separateur ds la drop liste #}
-            <li><a class="dropdown-item" href="{{ path('app_emprunt_index') }}">Gestion des emprunts</a></li>
-            <li><a class="dropdown-item" href="{{ path('app_emprunt_history') }}">historique des emprunts</a></li>
-            <li><hr class="dropdown-divider"></li> {# trait separateur ds la drop liste #}
-            <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Utilisateurs</a></li>
+          <ul class="dropdown-menu border-primary">
+            <li><h6 class="dropdown-header">Gestion Catalogue</h6></li>
+            <li><a class="dropdown-item" href="{{ path('app_category_index') }}">Liste des categories</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_category_new') }}">Ajouter une Catégorie</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_book_admin_index') }}">Gestion des livres</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_book_new') }}">Ajouter un livre</a></li>
+            
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Gestion Emprunts</h6></li>
+            <li><a class="dropdown-item" href="{{ path('app_emprunt_index') }}">Emprunts en cours</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_emprunt_history') }}">Historique complet</a></li>
+            
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Membres</h6></li>
+            <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Liste des Utilisateurs</a></li>
           </ul>
         </li>
         {% endif %}
-         {% if app.user == false %}
+      </ul>
+
+      {# CONNEXION / INSCRIPTION / DECONNEXION #}
+      <ul class="navbar-nav ms-auto">
+        {% if not app.user %}
           <li class="nav-item">
-            <a href="{{ path('app_register') }} " class='nav-link'>S'inscrire</a>
+            <a href="{{ path('app_register') }}" class="btn btn-outline-primary me-2">S'inscrire</a>
           </li> 
           <li class="nav-item">
-            <a href="{{ path('app_login') }} " class='nav-link'>Se connecter</a>
+            <a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a>
+          </li> 
+        {% else %}
+          <li class="nav-item">
+            <span class="navbar-text me-3 text-dark">Bonjour, <strong>{{ app.user.userIdentifier }}</strong></span>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-outline-danger btn-sm" href="{{ path('app_logout') }}">Déconnexion</a>
           </li> 
         {% endif %}
-        <li class="nav-item">
-            <a class="nav-link text-danger" href="{{ path('app_logout') }}">Se déconnecter</a>
-        </li> 
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+
     </div>
   </div>
 </nav>
