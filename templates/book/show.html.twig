@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container containerForm">
         <div class="form">
-            <h1><h1>Détails du livre n° {{ book.id }}</h1></h1>
+            <h1><h1>Détails du livre: {{ book.titre }}</h1></h1>
 
             <table class="table">
             <tbody>
@@ -27,7 +27,7 @@
                 
             </tbody>
         </table>
-            <a href="{{ path('app_book_index') }}"  class="btn btn-primary">Revenir à la liste</a>
+            <a href="{{ path('app_book_admin_index') }}"  class="btn btn-primary">Revenir à la liste</a>
 
             <a href="{{ path('app_book_edit', {'id': book.id}) }}"  class="btn btn-secondary">Modifier</a>
 

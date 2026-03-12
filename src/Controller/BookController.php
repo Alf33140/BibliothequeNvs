@@ -114,7 +114,7 @@ final class BookController extends AbstractController
             }
         }
 
-        return $this->render('book/addstock.html.twig', [
+        return $this->render('emprunt/addstock.html.twig', [
             'form' => $form->createView(), 
             'book' => $book, 
         ]);
@@ -170,7 +170,7 @@ final class BookController extends AbstractController
     public function show(Book $book): Response
     {
         return $this->render('book/show.html.twig', [
-            'book' => $book, // Assure-toi que cette ligne est identique
+            'book' => $book, 
         ]);
     }
 }

@@ -3,10 +3,52 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
+<div class="container text-center mt-5">
+  
+    
+    <div class="mt-4">
+        <button id="btnLancerCharge" class="btn btn-danger btn-lg shadow">
+            📯 LANCER LA CHARGE
+        </button>
+    </div>
+
+    {# Le lecteur audio caché #}
+    <audio id="chargeAudio" preload="auto">
+        <source src="{{ asset('/audio/charge.mp3') }}" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btnLancerCharge');
+        const audio = document.getElementById('chargeAudio');
+
+        btn.addEventListener('click', function() {
+            // On lance la lecture
+            audio.play().then(() => {
+                console.log("La cavalerie arrive !");
+                // Optionnel : on désactive le bouton après le clic pour éviter les doubles lancements
+                btn.disabled = true;
+                btn.innerText = "📯 CHARGE EN COURS...";
+            }).catch(error => {
+                console.error("Erreur de lecture : ", error);
+                alert("Impossible de lire le son. Vérifiez le fichier public/audio/charge.mp3");
+            });
+        });
+    });
+</script>
 <div class="container mt-5 text-center">
     <h1>Bienvenue sur notre Bibliotheque</h1>
     <p class="lead">Connecté avec succès !</p>
     <hr>
-    <a href="{{ path('app_book_index') }}" class="btn btn-primary btn-lg">Voir le catalogue</a>
+    
+</div>
+<div class="container my-5 text-center">
+    {# INCRUSTATION DE L IMAGE #}
+    <img src="{{ asset('uploads/images/charleston.jpg') }}"
+         
+         class="img-fluid rounded shadow mx-auto d-block"
+         style="max-width: 80%; height: auto;">
 </div>
 {% endblock %}

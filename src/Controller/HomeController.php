@@ -12,11 +12,11 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(CategoryRepository $categoryRepository): Response
     {
-        // On récupère toutes les catégories (qui contiennent leurs livres grâce à la relation)
+        // Recupde toutes les catégories 
         $categories = $categoryRepository->findAll();
 
         return $this->render('home/accueil.html.twig', [
-            'categories' => $categories, // On envoie la variable attendue par Twig
+            'categories' => $categories, 
         ]);
     }
 }

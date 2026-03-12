@@ -28,7 +28,7 @@
         {# ESPACE UTILISATEUR CONNECTE #}
         {% if app.user %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ path('app_emprunt_mes_emprunts') }}">Mes emprunts</a>
+                <a class="nav-link" href="{{ path('app_emprunt_mes_emprunts') }}">Espace Membre</a>
             </li>
         {% endif %}
 
@@ -69,7 +69,7 @@
           </li> 
         {% else %}
           <li class="nav-item">
-            <span class="navbar-text me-3 text-dark">Bonjour, <strong>{{ app.user.userIdentifier }}</strong></span>
+            <span class="navbar-text me-3 text-dark">Bonjour, Cher Membre: <strong>{{ app.user.lastname }}</strong></span>
           </li>
           <li class="nav-item">
             <a class="btn btn-outline-danger btn-sm" href="{{ path('app_logout') }}">Déconnexion</a>

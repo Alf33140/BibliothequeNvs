@@ -4,10 +4,10 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1 class="mb-4">Mon Historique de Lecteur</h1>
+    <h1 class="mb-4">Mon Historique de membre</h1>
     
     <div class="alert alert-info">
-        Bonjour <strong>{{ app.user.firstname }}</strong>, vous avez effectué {{ emprunts|length }} emprunt(s) au total.
+        Bonjour <strong>{{ app.user.lastname }}</strong>, vous avez effectué {{ emprunts|length }} emprunt(s) au total.
     </div>
 
     <div class="row">

@@ -44,7 +44,7 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
 {
-    // On force la redirection vers 'app_home' sans se soucier du reste
+   
     return new RedirectResponse($this->urlGenerator->generate('app_home'));
 }
 

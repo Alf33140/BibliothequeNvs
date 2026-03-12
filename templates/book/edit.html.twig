@@ -11,7 +11,7 @@
             
             {{ include('book/_form.html.twig', {'button_label': 'Update'}) }}
 
-            <a href="{{ path('app_book_index') }}"  class="btn btn-primary">Revenir à la liste</a>
+            <a href="{{ path('app_book_admin_index') }}"  class="btn btn-primary">Revenir à la liste</a>
             <a href="{{ path('app_stock_add_history', {'id': book.id}) }}" class="btn btn-primary">Voir l'historique</a>
             {{ include('book/_delete_form.html.twig') }}
         </div>
